@@ -90,6 +90,21 @@
     function showNav() { navbar.style.top = '0'; clearTimeout(navTimeout); navTimeout = setTimeout(() => { navbar.style.top = '-60px'; }, 3000); }
     document.addEventListener('mousemove', showNav);
     showNav(); // initial call
+    const playlistSelector = document.querySelector('.playlist-selector');
+
+function showUI() {
+    navbar.style.top = '0';
+    playlistSelector.style.top = '70px'; // original position
+    clearTimeout(navTimeout);
+    navTimeout = setTimeout(() => {
+        const navHeight = navbar.offsetHeight;
+        navbar.style.top = `-${navHeight}px`;
+        playlistSelector.style.top = `-${navHeight + 50}px`; // move it off screen
+    }, 3000);
+}
+
+document.addEventListener('mousemove', showUI);
+showUI();
   </script>
 </body>
 </html>
