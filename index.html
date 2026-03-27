@@ -40,10 +40,13 @@
 
   <nav>
     <h1>CalmStream</h1>
-    <a href="index.html">Home</a>
+    <div class="nav-right">
+      <button id="soundToggle" class="sound-btn">🔇</button>
+      <a href="index.html">Home</a>
+    </div>
   </nav>
 
-  <video id="player" autoplay controls playsinline></video>
+  <video id="player" autoplay playsinline></video>
 
   <script>
     const videoFiles = [
@@ -54,15 +57,18 @@
 
     let currentIndex = 0;
     const player = document.getElementById("player");
+    const soundToggle = document.getElementById("soundToggle");
+
+    // Load saved volume state
+    let isMuted = localStorage.getItem("muted") === "true";
+    player.muted = isMuted;
+    soundToggle.textContent = isMuted ? "🔇" : "🔊";
 
     function playVideo(index) {
       player.src = videoFiles[index];
-
-      // Try autoplay with sound
       player.play().catch(() => {
-        // fallback: mute if browser blocks autoplay
         player.muted = true;
-        player.play();
+        soundToggle.textContent = "🔇";
       });
 
       // preload next video
@@ -75,6 +81,14 @@
     player.addEventListener("ended", () => {
       currentIndex = (currentIndex + 1) % videoFiles.length;
       playVideo(currentIndex);
+    });
+
+    // Sound toggle
+    soundToggle.addEventListener("click", () => {
+      player.muted = !player.muted;
+      isMuted = player.muted;
+      localStorage.setItem("muted", isMuted);
+      soundToggle.textContent = isMuted ? "🔇" : "🔊";
     });
 
     playVideo(currentIndex);
@@ -122,10 +136,34 @@ nav h1 {
   font-weight: 500;
 }
 
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
 nav a {
   color: white;
   text-decoration: none;
   font-size: 14px;
+}
+
+/* Sound button */
+.sound-btn {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.4);
+  color: white;
+  font-size: 16px;
+  padding: 6px 10px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(6px);
+}
+
+.sound-btn:hover {
+  opacity: 1;
+  background: rgba(255,255,255,0.1);
 }
 
 /* LANDING */
@@ -185,3 +223,4 @@ nav a {
     height: 50px;
   }
 }
+
