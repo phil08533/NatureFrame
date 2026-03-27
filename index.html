@@ -1,33 +1,6 @@
-<!-- index.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CalmStream</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+<!-- index.html remains the same -->
 
-  <nav>
-    <h1>CalmStream</h1>
-  </nav>
-
-  <div class="landing">
-    <video autoplay muted loop playsinline>
-      <source src="videos/sample.mp4" type="video/mp4">
-    </video>
-
-    <div class="center">
-      <a href="watch.html" class="enter-btn">Enter</a>
-    </div>
-  </div>
-
-</body>
-</html>
-
-
-<!-- watch.html -->
+<!-- watch.html with dynamic playlists and crossfade -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -38,7 +11,7 @@
 </head>
 <body>
 
-  <nav>
+  <nav id="navbar">
     <h1>CalmStream</h1>
     <div class="nav-right">
       <button id="soundToggle" class="sound-btn">🔇</button>
@@ -46,181 +19,77 @@
     </div>
   </nav>
 
-  <video id="player" autoplay playsinline></video>
+  <div class="playlist-selector">
+    <button class="playlist-btn" data-playlist="All">All</button>
+    <button class="playlist-btn" data-playlist="Rain">Rain</button>
+    <button class="playlist-btn" data-playlist="Ocean">Ocean</button>
+    <button class="playlist-btn" data-playlist="Forest">Forest</button>
+  </div>
+
+  <video id="player1" autoplay playsinline></video>
+  <video id="player2" autoplay playsinline style="opacity:0; position:fixed; top:0; left:0;"></video>
 
   <script>
-    const videoFiles = [
-      "videos/video1.mp4",
-      "videos/video2.mp4",
-      "videos/video3.mp4"
-    ];
+    const allVideos = ["videos/video1.mp4","videos/video2.mp4","videos/video3.mp4"];
+    const playlists = {"All": allVideos, "Rain": allVideos, "Ocean": allVideos, "Forest": allVideos};
 
+    let currentPlaylist = playlists["All"];
     let currentIndex = 0;
-    const player = document.getElementById("player");
-    const soundToggle = document.getElementById("soundToggle");
+    const player1 = document.getElementById("player1");
+    const player2 = document.getElementById("player2");
+    let activePlayer = player1;
+    let inactivePlayer = player2;
 
-    // Load saved volume state
+    const soundToggle = document.getElementById("soundToggle");
     let isMuted = localStorage.getItem("muted") === "true";
-    player.muted = isMuted;
+    player1.muted = player2.muted = isMuted;
     soundToggle.textContent = isMuted ? "🔇" : "🔊";
 
-    function playVideo(index) {
-      player.src = videoFiles[index];
-      player.play().catch(() => {
-        player.muted = true;
-        soundToggle.textContent = "🔇";
-      });
+    function playNextVideo() {
+      inactivePlayer.src = currentPlaylist[currentIndex];
+      inactivePlayer.play().catch(() => { inactivePlayer.muted = true; inactivePlayer.play(); });
 
-      // preload next video
-      const nextIndex = (index + 1) % videoFiles.length;
-      const preload = document.createElement("video");
-      preload.src = videoFiles[nextIndex];
-      preload.preload = "auto";
+      inactivePlayer.style.transition = 'opacity 1.5s ease';
+      inactivePlayer.style.opacity = 1;
+      activePlayer.style.opacity = 0;
+
+      // swap players
+      [activePlayer, inactivePlayer] = [inactivePlayer, activePlayer];
+      currentIndex = (currentIndex + 1) % currentPlaylist.length;
     }
 
-    player.addEventListener("ended", () => {
-      currentIndex = (currentIndex + 1) % videoFiles.length;
-      playVideo(currentIndex);
-    });
+    // Initial load
+    activePlayer.src = currentPlaylist[currentIndex];
+    activePlayer.play();
+    currentIndex++;
+
+    activePlayer.addEventListener("ended", playNextVideo);
 
     // Sound toggle
     soundToggle.addEventListener("click", () => {
-      player.muted = !player.muted;
-      isMuted = player.muted;
+      activePlayer.muted = inactivePlayer.muted = !activePlayer.muted;
+      isMuted = activePlayer.muted;
       localStorage.setItem("muted", isMuted);
       soundToggle.textContent = isMuted ? "🔇" : "🔊";
     });
 
-    playVideo(currentIndex);
-  </script>
+    // Playlist buttons
+    document.querySelectorAll('.playlist-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentPlaylist = playlists[btn.dataset.playlist];
+        currentIndex = 0;
+        activePlayer.src = currentPlaylist[currentIndex];
+        activePlayer.play();
+        currentIndex++;
+      });
+    });
 
+    // Auto-hide nav
+    const navbar = document.getElementById('navbar');
+    let navTimeout;
+    function showNav() { navbar.style.top = '0'; clearTimeout(navTimeout); navTimeout = setTimeout(() => { navbar.style.top = '-60px'; }, 3000); }
+    document.addEventListener('mousemove', showNav);
+    showNav(); // initial call
+  </script>
 </body>
 </html>
-
-
-<!-- styles.css -->
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html, body {
-  height: 100%;
-  width: 100%;
-  background: #000;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  overflow: hidden;
-  color: white;
-}
-
-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 60px;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  padding: 0 20px;
-  z-index: 20;
-
-  background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);
-}
-
-nav h1 {
-  font-size: 18px;
-  font-weight: 500;
-}
-
-.nav-right {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-nav a {
-  color: white;
-  text-decoration: none;
-  font-size: 14px;
-}
-
-/* Sound button */
-.sound-btn {
-  background: rgba(0,0,0,0.3);
-  border: 1px solid rgba(255,255,255,0.4);
-  color: white;
-  font-size: 16px;
-  padding: 6px 10px;
-  cursor: pointer;
-  opacity: 0.6;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(6px);
-}
-
-.sound-btn:hover {
-  opacity: 1;
-  background: rgba(255,255,255,0.1);
-}
-
-/* LANDING */
-.landing video {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: 1;
-}
-
-.center {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 10;
-}
-
-.enter-btn {
-  padding: 12px 28px;
-  border: 1px solid rgba(255,255,255,0.5);
-  color: white;
-  text-decoration: none;
-  font-size: 16px;
-  backdrop-filter: blur(6px);
-  background: rgba(0,0,0,0.3);
-  transition: all 0.3s ease;
-}
-
-.enter-btn:hover {
-  background: rgba(255,255,255,0.1);
-}
-
-/* PLAYER */
-#player {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: 1;
-}
-
-/* MOBILE */
-@media (max-width: 768px) {
-  #player,
-  .landing video {
-    object-fit: contain;
-    background: black;
-  }
-
-  nav {
-    height: 50px;
-  }
-}
-
