@@ -8,18 +8,24 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
   <nav>
     <h1>CalmStream</h1>
-    <a href="watch.html">Enter</a>
   </nav>
 
-  <div class="hero">
+  <div class="landing">
     <video autoplay muted loop playsinline>
       <source src="videos/sample.mp4" type="video/mp4">
     </video>
+
+    <div class="center">
+      <a href="watch.html" class="enter-btn">Enter</a>
+    </div>
   </div>
+
 </body>
 </html>
+
 
 <!-- watch.html -->
 <!DOCTYPE html>
@@ -31,11 +37,13 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
   <nav>
     <h1>CalmStream</h1>
+    <a href="index.html">Home</a>
   </nav>
 
-  <video id="player" autoplay muted playsinline></video>
+  <video id="player" autoplay controls playsinline></video>
 
   <script>
     const videoFiles = [
@@ -49,9 +57,15 @@
 
     function playVideo(index) {
       player.src = videoFiles[index];
-      player.play();
 
-      // Preload next video
+      // Try autoplay with sound
+      player.play().catch(() => {
+        // fallback: mute if browser blocks autoplay
+        player.muted = true;
+        player.play();
+      });
+
+      // preload next video
       const nextIndex = (index + 1) % videoFiles.length;
       const preload = document.createElement("video");
       preload.src = videoFiles[nextIndex];
@@ -65,37 +79,90 @@
 
     playVideo(currentIndex);
   </script>
+
 </body>
 </html>
 
+
 <!-- styles.css -->
-body, html {
+* {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
   height: 100%;
-  background: black;
-  font-family: Arial, sans-serif;
+  width: 100%;
+  background: #000;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   overflow: hidden;
+  color: white;
 }
 
 nav {
   position: fixed;
   top: 0;
+  left: 0;
   width: 100%;
+  height: 60px;
+
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 10px 20px;
-  z-index: 10;
-  color: white;
+  justify-content: space-between;
+
+  padding: 0 20px;
+  z-index: 20;
+
+  background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);
+}
+
+nav h1 {
+  font-size: 18px;
+  font-weight: 500;
 }
 
 nav a {
   color: white;
   text-decoration: none;
+  font-size: 14px;
 }
 
-.hero video,
+/* LANDING */
+.landing video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+
+.center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+}
+
+.enter-btn {
+  padding: 12px 28px;
+  border: 1px solid rgba(255,255,255,0.5);
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+  backdrop-filter: blur(6px);
+  background: rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+}
+
+.enter-btn:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+/* PLAYER */
 #player {
   position: fixed;
   top: 0;
@@ -103,12 +170,18 @@ nav a {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  z-index: 1;
 }
 
-/* Mobile behavior */
+/* MOBILE */
 @media (max-width: 768px) {
-  #player {
+  #player,
+  .landing video {
     object-fit: contain;
     background: black;
+  }
+
+  nav {
+    height: 50px;
   }
 }
