@@ -98,4 +98,35 @@ nav {
   nav h1 {
     font-size: 16px;
   }
+  /* Playlist buttons container */
+.playlist-selector {
+  position: fixed;
+  top: 70px; /* below nav */
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 15;
+}
+
+/* Individual buttons */
+.playlist-btn {
+  padding: 8px 16px;
+  border: 1px solid rgba(255,255,255,0.5);
+  background: rgba(0,0,0,0.3);
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  backdrop-filter: blur(6px);
+  transition: all 0.3s ease;
+}
+
+.playlist-btn:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+/* Smooth nav hide transition */
+#navbar {
+  transition: top 0.5s ease;
+}
 }
