@@ -1,0 +1,101 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Base */
+html, body {
+  height: 100%;
+  width: 100%;
+  background: #000;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow: hidden;
+  color: white;
+}
+
+/* NAVBAR */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 20px;
+  z-index: 10;
+
+  /* subtle glass effect */
+  background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
+  backdrop-filter: blur(6px);
+}
+
+/* Title */
+nav h1 {
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  opacity: 0.9;
+}
+
+/* Links */
+nav a {
+  font-size: 14px;
+  text-decoration: none;
+  color: rgba(255,255,255,0.8);
+  transition: opacity 0.3s ease;
+}
+
+nav a:hover {
+  opacity: 1;
+}
+
+/* VIDEO BACKGROUND */
+#player {
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+  z-index: 1;
+}
+
+/* Soft dark overlay (helps readability slightly) */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.15);
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Ensure nav stays above overlay */
+nav {
+  z-index: 20;
+}
+
+/* MOBILE BEHAVIOR */
+@media (max-width: 768px) {
+  #player {
+    object-fit: contain; /* prevents cropping */
+    background: black;
+  }
+
+  nav {
+    height: 50px;
+    padding: 0 15px;
+  }
+
+  nav h1 {
+    font-size: 16px;
+  }
+}
