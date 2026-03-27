@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CalmStream</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <nav>
+    <h1>CalmStream</h1>
+    <a href="index.html">Home</a>
+  </nav>
+
+  <video id="player" autoplay muted playsinline></video>
+
+  <script>
+    const videoFiles = [
+      "videos/video1.mp4",
+      "videos/video2.mp4",
+      "videos/video3.mp4"
+    ];
+
+    let currentIndex = 0;
+    const player = document.getElementById("player");
+
+    // Preload next video
+    let nextVideo = document.createElement("video");
+    nextVideo.preload = "auto";
+
+    function loadVideo(index) {
+      player.src = videoFiles[index];
+      player.play().catch(() => {});
+      
+      // preload next
+      const nextIndex = (index + 1) % videoFiles.length;
+      nextVideo.src = videoFiles[nextIndex];
+    }
+
+    player.addEventListener("ended", () => {
+      currentIndex = (currentIndex + 1) % videoFiles.length;
+      loadVideo(currentIndex);
+    });
+
+    // Start
+    loadVideo(currentIndex);
+  </script>
+
+</body>
+</html>
