@@ -101,12 +101,16 @@ nav {
   /* Playlist buttons container */
 .playlist-selector {
   position: fixed;
-  top: 70px; /* below nav */
+  top: 0; /* place at top of screen */
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   gap: 10px;
-  z-index: 15;
+  z-index: 20; /* higher than nav and video */
+  padding: 10px 0;
+  background: rgba(0,0,0,0.3); /* optional light blur background */
+  backdrop-filter: blur(6px);
+  transition: top 0.5s ease; /* smooth auto-hide */
 }
 
 /* Individual buttons */
